@@ -365,3 +365,86 @@ void UI_Task(void)
     delay(180);
 
 }
+
+/*************************************************
+ * 调试接口
+ *************************************************/
+
+#ifdef DEBUG_UI
+
+void UI_DumpState(void)
+{
+
+    Serial.println();
+
+    Serial.println("========== UI ==========");
+
+    Serial.print("Scene : ");
+
+    Serial.println((int)systemState.scene);
+
+    Serial.print("NeedRefresh : ");
+
+    Serial.println(uiNeedRefresh);
+
+    Serial.println("========================");
+
+}
+
+#endif
+
+
+/*************************************************
+ * 获取当前按钮
+ *************************************************/
+
+uint8_t UI_GetCurrentButton(void)
+{
+
+    switch(systemState.scene)
+    {
+
+        case SCENE_CABLE:
+
+            return 0;
+
+        case SCENE_MEDIA:
+
+            return 1;
+
+        case SCENE_DVD:
+
+            return 2;
+
+        case SCENE_DIGITAL:
+
+            return 3;
+
+        case SCENE_KTV:
+
+            return 4;
+
+        default:
+
+            return 255;
+
+    }
+
+}
+
+
+/*************************************************
+ * 强制重绘
+ *************************************************/
+
+void UI_ForceRefresh(void)
+{
+
+    uiNeedRefresh = true;
+
+}
+
+
+/*************************************************
+ * UI结束
+ *************************************************/
