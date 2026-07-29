@@ -25,13 +25,15 @@ typedef enum
  *************************************************/
 typedef struct
 {
-    SceneType scene;
+    SceneType scene;          // 当前场景
 
-    bool projectorOn;
+    bool projectorOn;         // 投影状态
 
-    bool amplifierOn;
+    bool amplifierOn;         // 功放状态
 
-    bool videoMode;
+    bool videoMode;           // 是否视频模式
+
+    uint8_t ampInput;         // 当前功放输入(AMP_HDMI1...AMP_AN2)
 
 } SystemState;
 

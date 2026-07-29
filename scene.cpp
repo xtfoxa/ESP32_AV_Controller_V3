@@ -196,15 +196,21 @@ void Scene_Change(SceneType scene)
     if(cfg == nullptr)
         return;
 
-    /*************************************************
-     * 更新系统状态
-     *************************************************/
 
-    systemState.scene = scene;
 
-    systemState.projectorOn = cfg->useProjector;
+   /*************************************************
+    * 更新系统状态
+    *************************************************/
 
-    systemState.videoMode = cfg->videoMode;
+    systemState.scene = scene->scene;
+
+    systemState.projectorOn = scene->useProjector;
+
+    systemState.videoMode = scene->videoMode;
+
+    systemState.amplifierOn = true;
+
+    systemState.ampInput = scene->ampInput;
 
     /*************************************************
      * 应用设备
@@ -221,6 +227,11 @@ void Scene_Change(SceneType scene)
     /*************************************************
      * 刷新UI
      *************************************************/
+
+    UI_Refresh();
+
+    //增加同步
+    Save_SystemState();
 
     UI_Refresh();
 
@@ -241,5 +252,19 @@ void Scene_Shutdown(void)
     Save_SystemState();
 
     UI_Refresh();
+
+    /*************************************************
+    * 更新系统状态
+    *************************************************/
+
+    systemState.scene = SCENE_NONE;
+
+    systemState.projectorOn = false;
+
+    systemState.amplifierOn = false;
+
+    systemState.videoMode = false;
+
+    systemState.ampInput = 0;
 
 }
