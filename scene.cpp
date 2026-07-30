@@ -27,9 +27,10 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 
         true,
 
-        {0},
+       //开机顺序
+        {1,6,8},
 
-        0
+        3
 
     },
 
@@ -48,9 +49,9 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 
         true,
 
-        {0},
+        {2,5,6,8},
 
-        0
+        4
 
     },
 
@@ -69,9 +70,9 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 
         true,
 
-        {0},
+        {3,6,8},
 
-        0
+        3
 
     },
 
@@ -86,13 +87,13 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 
         AMP_AN1,
 
-        true,
+        false,
 
-        true,
+        false,
 
-        {0},
+        {4,5,8},
 
-        0
+        3
 
     },
 
@@ -111,9 +112,9 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 
         true,
 
-        {0},
+        {9,10,11,12,13,5,6,8},
 
-        0
+        8
 
     }
 

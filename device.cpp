@@ -420,16 +420,21 @@ void Device_Task()
         /*********************************************
          * 功放电源
          *********************************************/
-
         case DEV_AMP_POWER:
 
-            Device_AmpPower(
+            if(task.value)
+            {
+               Amplifier_Start(
+                currentDeviceState.ampInput
+               );
+             }
+             else
+             {
+                  Device_AmpPower(false);
+             }
 
-                task.value
+               break;
 
-            );
-
-            break;
 
 
         /*********************************************
@@ -628,7 +633,8 @@ void Device_GenerateDiff(
     if(current.ampInput!=target.ampInput)
     {
 
-        Queue_Push(
+        if(current.amplifierOn)
+        {Queue_Push(
 
             DEV_AMP_INPUT,
 
@@ -636,9 +642,10 @@ void Device_GenerateDiff(
 
             true,
 
-            500
+            0
 
         );
+        }
 
     }
 
