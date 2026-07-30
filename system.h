@@ -2,23 +2,8 @@
 #define SYSTEM_H
 
 #include <Arduino.h>
+#include "scene.h"
 
-/*************************************************
- * 场景
- *************************************************/
-typedef enum
-{
-    SCENE_NONE = -1,
-
-    SCENE_CABLE = 0,
-    SCENE_MEDIA,
-    SCENE_DVD,
-    SCENE_DIGITAL,
-    SCENE_KTV,
-
-    SCENE_COUNT
-
-} SceneType;
 
 /*************************************************
  * 系统状态

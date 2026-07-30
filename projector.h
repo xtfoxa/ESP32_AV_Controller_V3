@@ -32,11 +32,11 @@ void Projector_Init();
 
 // 投影机开机
 
-void Projector_ON();
+void Projector_Start();
 
-//
+// 投影机关机
 
-void Projector_OFF();
+void Projector_Stop();
 
 
 
@@ -44,9 +44,7 @@ void Projector_OFF();
 
 void Projector_Query();
 
-//辅助函数
-void Projector_Stop();
-void Projector_Start();
+
 
 
 #endif

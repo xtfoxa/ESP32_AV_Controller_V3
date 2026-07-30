@@ -1,14 +1,11 @@
 //第一部分
 #include "scene.h"
 #include "system.h"
-#include "config.h"
-
 #include "eastcato.h"
 #include "amplifier.h"
 #include "projector.h"
-
-#include "storage.h"
 #include "ui.h"
+#include "device.h"
 
 
 //第二部分
@@ -20,7 +17,7 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 
         SCENE_CABLE,
 
-        {true,false,false,false,false,ftrue,false,true},
+        {true,false,false,false,false,true,false,true},
 
         {false,false,false,false,false},
 
@@ -158,7 +155,7 @@ void Scene_Apply(const SceneConfig* cfg)
 
     for(int i=0;i<8;i++)
     {
-        Eastcato_SetA(i + 1, cfg->eastA[i]);
+        Device_SetA(i + 1, cfg->eastA[i]);
     }
 
     /*************************************************
@@ -167,23 +164,20 @@ void Scene_Apply(const SceneConfig* cfg)
 
     for(int i=0;i<5;i++)
     {
-        Eastcato_SetB(i + 1, cfg->eastB[i]);
+        Device_SetB(i + 1, cfg->eastB[i]);
     }
 
     /*************************************************
      * 功放
      *************************************************/
 
-    Amplifier_SetInput(cfg->ampInput);
+    Device_AmpInput(cfg->ampInput);
 
     /*************************************************
      * 投影
      *************************************************/
 
-    if(cfg->useProjector)
-        Projector_On();
-    else
-        Projector_Off();
+    Device_Projector(cfg->useProjector);
 
 }
 
@@ -202,15 +196,15 @@ void Scene_Change(SceneType scene)
     * 更新系统状态
     *************************************************/
 
-    systemState.scene = scene->scene;
+    systemState.scene = cfg->scene;
 
-    systemState.projectorOn = scene->useProjector;
+    systemState.projectorOn = cfg->useProjector;
 
-    systemState.videoMode = scene->videoMode;
+    systemState.videoMode = cfg->videoMode;
 
     systemState.amplifierOn = true;
 
-    systemState.ampInput = scene->ampInput;
+    systemState.ampInput = cfg->ampInput;
 
     /*************************************************
      * 应用设备
@@ -218,53 +212,29 @@ void Scene_Change(SceneType scene)
 
     Scene_Apply(cfg);
 
-    /*************************************************
-     * 保存
-     *************************************************/
-
-    Save_SystemState();
 
     /*************************************************
      * 刷新UI
      *************************************************/
 
-    UI_Refresh();
 
-    //增加同步
-    Save_SystemState();
-
-    UI_Refresh();
+    //UI_RequestRefresh();
 
 }
 
 //关机
-void Scene_Shutdown(void)
+   void Scene_Shutdown(void)
 {
+    Device_Projector(false);
 
-    Projector_Off();
+    Device_AmpPower(false);
 
-    Amplifier_Power(false);
-
-    Eastcato_AllOff();
-
-    systemState.scene = SCENE_NONE;
-
-    Save_SystemState();
-
-    UI_Refresh();
-
-    /*************************************************
-    * 更新系统状态
-    *************************************************/
+    Device_AllOff();
 
     systemState.scene = SCENE_NONE;
-
     systemState.projectorOn = false;
-
     systemState.amplifierOn = false;
-
     systemState.videoMode = false;
-
     systemState.ampInput = 0;
-
 }
+

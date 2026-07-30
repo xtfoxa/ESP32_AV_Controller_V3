@@ -75,3 +75,13 @@ void Projector_Stop()
 
 
 }
+
+void Projector_ON()
+{
+    Projector_Start();
+}
+
+void Projector_OFF()
+{
+    Projector_Stop();
+}

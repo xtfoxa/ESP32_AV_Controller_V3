@@ -2,7 +2,7 @@
 #include "config.h"
 #include "system.h"
 #include "scene.h"
-
+#include "touch.h"
 #include <Arduino_GFX_Library.h>
 #include <Wire.h>
 
