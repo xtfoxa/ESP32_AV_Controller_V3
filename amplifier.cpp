@@ -101,8 +101,10 @@ void Amplifier_Select(uint8_t input)
             Amp_AN2();
             break;
 
-        default:
+        case 6:
+            Amp_OFF();
             break;
+
 
     }
 

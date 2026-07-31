@@ -7,6 +7,7 @@
 #define AMP_HDMI3   3
 #define AMP_AN1     4
 #define AMP_AN2     5
+#define AMP_OFF     6
 
 
 // 初始化

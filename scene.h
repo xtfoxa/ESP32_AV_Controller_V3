@@ -16,6 +16,7 @@ enum SceneType
     SCENE_DIGITAL,
     SCENE_KTV,
 
+    SCENE_POWER_OFF,
     SCENE_COUNT
 };
 
@@ -65,6 +66,7 @@ void Scene_Init(void);
 
 // 获取配置
 const SceneConfig* Scene_Get(SceneType scene);
+
 
 // 切换场景（唯一入口）
 void Scene_Change(SceneType scene);

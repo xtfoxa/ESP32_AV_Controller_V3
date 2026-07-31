@@ -5,8 +5,12 @@
 #include "touch.h"
 #include <Arduino_GFX_Library.h>
 #include <Wire.h>
+#include "avdisplay.h"
+#include "font.h"
 
-extern Arduino_GFX *gfx;
+#define COLOR_GREEN 0x05E0
+
+
 
 /*************************************************
  * UI状态
@@ -24,8 +28,8 @@ typedef struct
     int16_t y;
     int16_t w;
     int16_t h;
+    uint8_t id;
 
-    const char *title;
 
 } UIButton;
 
@@ -36,12 +40,13 @@ typedef struct
 
 static const UIButton buttons[] =
 {
-    {  8,  38,154,38,"Cable"   },
-    {  8,  82,154,38,"Media"   },
-    {  8, 126,154,38,"DVD"     },
-    {  8, 170,154,38,"Digital" },
-    {  8, 214,154,38,"KTV"     },
-    {  8, 270,154,38,"Power"   }
+    {4,0,104,85,0},
+    {108,0,104,85,1},
+    {212,0,104,85,2},
+
+    {4,85,104,85,3},
+    {108,85,104,85,4},
+    {212,85,104,85,5}
 };
 
 #define BUTTON_COUNT   (sizeof(buttons)/sizeof(buttons[0]))
@@ -58,7 +63,7 @@ static const SceneType buttonSceneMap[] =
     SCENE_DVD,
     SCENE_DIGITAL,
     SCENE_KTV,
-    SCENE_NONE          // Power
+    SCENE_POWER_OFF          // Power
 };
 
 
@@ -93,139 +98,226 @@ static void Draw_Title(void)
  * 绘制单个按钮（V3）
  *************************************************/
 
-static void Draw_Button(uint8_t id)
+static void Draw_Button_Text(uint8_t id,int16_t x,int16_t y)
 {
 
-    bool active = false;
-
-    switch(systemState.scene)
+    switch(id)
     {
 
-        case SCENE_CABLE:
+        // 有线电视
+        case 0:
 
-            active = (id == 0);
-
-            break;
-
-        case SCENE_MEDIA:
-
-            active = (id == 1);
-
-            break;
-
-        case SCENE_DVD:
-
-            active = (id == 2);
+            DrawChinese16(
+                gfx,
+                x,
+                y,
+                "有线电视",
+                COLOR_WHITE
+            );
 
             break;
 
-        case SCENE_DIGITAL:
 
-            active = (id == 3);
+        // 流媒体
+        case 1:
+
+            DrawChinese16(
+                gfx,
+                x,
+                y,
+                "流媒体",
+                COLOR_WHITE
+            );
+
+            break;
+
+
+        // DVD
+        case 2:
+
+            gfx->setCursor(x,y);
+            gfx->setTextColor(COLOR_WHITE);
+            gfx->setTextSize(2);
+            gfx->print("DVD");
 
             break;
 
-        case SCENE_KTV:
 
-            active = (id == 4);
+        // 数播
+        case 3:
+
+            DrawChinese16(
+                gfx,
+                x,
+                y,
+                "数播",
+                COLOR_WHITE
+            );
 
             break;
 
-        default:
 
-            active = false;
+        // 卡拉OK
+        case 4:
+
+            DrawChinese16(
+                gfx,
+                x,
+                y,
+                "卡拉",
+                COLOR_WHITE
+            );
+
+
+            gfx->setCursor(
+                x+32,
+                y
+            );
+
+            gfx->setTextColor(COLOR_WHITE);
+            gfx->setTextSize(2);
+            gfx->print("OK");
+
 
             break;
+
+
+        // 关机
+        case 5:
+
+            DrawChinese16(
+                gfx,
+                x,
+                y,
+                "关机",
+                COLOR_WHITE
+            );
+
+            break;
+
+    }
+
+}
+
+
+
+void Draw_Button(uint8_t index)
+{
+
+    const UIButton &btn = buttons[index];
+
+
+    uint16_t borderColor = COLOR_WHITE;
+
+    //当前运行场景
+    if(buttonSceneMap[index] == systemState.scene)
+    {
+    borderColor = COLOR_GREEN;
+    }
+
+    // 正在点击反馈
+    if(buttonSceneMap[index] == systemState.scene)
+    {
+    borderColor = COLOR_GREEN;
     }
 
 
-    const UIButton *btn = &buttons[id];
+    gfx->drawRoundRect(
+
+    btn.x,
+    btn.y,
+    btn.w,
+    btn.h,
+    8,
+    borderColor
+
+     );
+// 加粗 2~3 像素
+    if(borderColor == COLOR_GREEN)
+    {
+
+        gfx->drawRoundRect(
+            btn.x + 1,
+            btn.y + 1,
+            btn.w - 2,
+            btn.h - 2,
+            7,
+            borderColor
+        );
 
 
-    /*************************************************
-     * 按钮背景
-     *************************************************/
+        gfx->drawRoundRect(
+            btn.x + 2,
+            btn.y + 2,
+            btn.w - 4,
+            btn.h - 4,
+            6,
+            borderColor
+        );
 
-    gfx->fillRoundRect(
+    }
 
-        btn->x,
 
-        btn->y,
+    int textWidth;
 
-        btn->w,
 
-        btn->h,
+    switch(btn.id)
+    {
 
-        8,
+        case 0:
+            textWidth = GetMixedWidth("有线电视");
+            break;
 
-        COLOR_GRAY
+
+        case 1:
+            textWidth = GetMixedWidth("流媒体");
+            break;
+
+
+        case 2:
+            textWidth = 3 * 12;   // DVD
+            break;
+
+
+        case 3:
+            textWidth = GetMixedWidth("数播");
+            break;
+
+
+        case 4:
+            textWidth = GetMixedWidth("卡拉") + 16;
+            break;
+
+
+        case 5:
+            textWidth = GetMixedWidth("关机");
+            break;
+
+
+    }
+
+
+    int16_t tx =
+        btn.x + (btn.w - textWidth)/2;
+
+
+    int16_t ty =
+        btn.y + (btn.h-16)/2;
+
+
+    Draw_Button_Text(
+
+        btn.id,
+
+        tx,
+
+        ty
 
     );
 
-
-    /*************************************************
-     * 边框
-     *************************************************/
-
-    if(active)
-    {
-
-        gfx->drawRoundRect(
-
-            btn->x,
-
-            btn->y,
-
-            btn->w,
-
-            btn->h,
-
-            8,
-
-            COLOR_GREEN
-
-        );
-
-    }
-    else
-    {
-
-        gfx->drawRoundRect(
-
-            btn->x,
-
-            btn->y,
-
-            btn->w,
-
-            btn->h,
-
-            8,
-
-            COLOR_WHITE
-
-        );
-
-    }
-
-
-    /*************************************************
-     * 文字
-     *************************************************/
-
-    gfx->setTextColor(COLOR_WHITE);
-
-    gfx->setTextSize(2);
-
-    int16_t tx = btn->x + 18;
-
-    int16_t ty = btn->y + 24;
-
-    gfx->setCursor(tx,ty);
-
-    gfx->print(btn->title);
-
 }
+
+
 /*************************************************
  * 绘制整个UI（V3）
  *************************************************/
@@ -239,11 +331,6 @@ void Draw_UI(void)
 
     gfx->fillScreen(COLOR_BLACK);
 
-    /*************************************************
-     * 标题
-     *************************************************/
-
-    Draw_Title();
 
     /*************************************************
      * 六个按钮
@@ -271,7 +358,10 @@ void UI_Refresh(void)
  * 判断触摸按钮
  *************************************************/
 
-static int Check_Button(int16_t x,int16_t y)
+static int Check_Button(
+    int16_t x,
+    int16_t y
+)
 {
 
     for(uint8_t i=0;i<BUTTON_COUNT;i++)
@@ -279,17 +369,25 @@ static int Check_Button(int16_t x,int16_t y)
 
         const UIButton *btn=&buttons[i];
 
+
         if(
             x>=btn->x &&
-            x<=(btn->x+btn->w) &&
+            x<=btn->x+btn->w &&
             y>=btn->y &&
-            y<=(btn->y+btn->h)
+            y<=btn->y+btn->h
         )
         {
-            return i;
+
+            
+            uiNeedRefresh = true;
+
+
+            return btn->id;
+
         }
 
     }
+
 
     return -1;
 
@@ -348,21 +446,42 @@ void UI_Task(void)
     /*************************************************
      * Power按钮
      *************************************************/
-
     if(buttonSceneMap[id] == SCENE_NONE)
     {
-        Scene_Shutdown();
 
-        return;
+    // 立即刷新一次，让用户看到反馈
+    systemState.scene = SCENE_NONE;
+
+    uiNeedRefresh = true;
+
+    Draw_UI();
+
+
+    delay(300);
+
+
+    Scene_Shutdown();
+
+
+    systemState.scene = SCENE_NONE;
+
+    uiNeedRefresh = true;
+
+
+    return;
     }
+    
 
     /*************************************************
      * 场景切换
      *************************************************/
 
-    Scene_Change(buttonSceneMap[id]);
+    uiNeedRefresh = true;
 
-    delay(180);
+    Draw_UI();
+
+
+    Scene_Change(buttonSceneMap[id]);
 
 }
 

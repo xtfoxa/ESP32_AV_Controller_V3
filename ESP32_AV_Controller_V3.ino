@@ -28,6 +28,8 @@
 
 #include <Arduino_GFX_Library.h>
 
+#include "avdisplay.h"
+
 
 /*************************************************
  *
@@ -42,52 +44,24 @@ void setup()
 
     delay(500);
 
-    Serial.println();
 
-    Serial.println("==================================");
+    Serial.println("START");
 
-    Serial.println("ESP32 AV Controller V3.3");
-
-    Serial.println("==================================");
-
-
-    //--------------------------------
-    // LCD
-    //--------------------------------
-
-    UI_Init();
-
-    //--------------------------------
-    // Touch
-    //--------------------------------
+    Display_Init();
+    Serial.println("display");
 
     Touch_Init();
 
-    //--------------------------------
-    // Device
-    //--------------------------------
-
     Device_Init();
-
-    //--------------------------------
-    // Scene
-    //--------------------------------
 
     Scene_Init();
 
-    //--------------------------------
-    // UI
-    //--------------------------------
-
     UI_Init();
-
-    //--------------------------------
-    // Dashboard
-    //--------------------------------
 
     WiFi_Init();
 
 }
+
 
 
 /*************************************************
@@ -122,23 +96,3 @@ void loop()
 
 }
 
-
-Arduino_DataBus *bus = new Arduino_HWSPI(
-    TFT_DC,
-    TFT_CS,
-    TFT_SCLK,
-    TFT_MOSI,
-    GFX_NOT_DEFINED
-);
-
-
-Arduino_GFX *gfx = new Arduino_ST7789(
-    bus,
-    TFT_RST,
-    1,
-    true,
-    LCD_WIDTH,
-    LCD_HEIGHT,
-    LCD_OFFSET_X,
-    LCD_OFFSET_Y
-);

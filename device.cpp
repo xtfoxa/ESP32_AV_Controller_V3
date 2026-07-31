@@ -422,18 +422,9 @@ void Device_Task()
          *********************************************/
         case DEV_AMP_POWER:
 
-            if(task.value)
-            {
-               Amplifier_Start(
-                currentDeviceState.ampInput
-               );
-             }
-             else
-             {
-                  Device_AmpPower(false);
-             }
-
-               break;
+             Device_AmpPower(task.value);
+             
+              break;
 
 
 
@@ -606,25 +597,65 @@ void Device_GenerateDiff(
     }
 
     /*************************************************
-     * 功放
-     *************************************************/
+ * 功放
+ *************************************************/
 
-    if(current.amplifierOn!=target.amplifierOn)
+if(current.amplifierOn != target.amplifierOn)
+{
+
+    if(target.amplifierOn)
     {
+        /*
+         * 功放开机流程：
+         *
+         * A8 ON
+         * Power ON
+         * 等36秒
+         * 输入切换
+         */
+
 
         Queue_Push(
+            DEV_A_POWER,
+            8,
+            true,
+            500
+        );
 
+        //RS232 POWER ON
+            Queue_Push(
             DEV_AMP_POWER,
-
             0,
+            true,
+            36000
+        );
 
-            target.amplifierOn,
 
-            1000
-
+        //36秒后切输入
+        Queue_Push(
+            DEV_AMP_INPUT,
+            target.ampInput,
+            true,
+            0
         );
 
     }
+    else
+    {
+        /*
+         * 关机
+         */
+
+        Queue_Push(
+            DEV_AMP_POWER,
+            0,
+            false,
+            1000
+        );
+
+    }
+
+}
 
     /*************************************************
      * 输入

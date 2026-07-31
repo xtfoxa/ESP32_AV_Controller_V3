@@ -116,6 +116,26 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 
         8
 
+    },
+
+    //  SCENE_POWER_OFF
+    {
+         SCENE_POWER_OFF,
+        {false,false,false,false,false,false,false,false},
+
+        {false,false,false,false,false},
+
+        AMP_OFF,
+
+        false,
+
+        false,
+
+        {0},
+
+        0
+    
+
     }
 
 };
@@ -125,7 +145,7 @@ const SceneConfig SceneTable[SCENE_COUNT] =
 const SceneConfig* Scene_Get(SceneType scene)
 {
 
-    if(scene < 0)
+    if(scene < 0 || scene >= SCENE_COUNT)
         return nullptr;
 
     if(scene >= SCENE_COUNT)
@@ -149,6 +169,76 @@ void Scene_Apply(const SceneConfig* cfg)
 
     if(cfg == nullptr)
         return;
+
+    /*************************************************
+     * 关机特殊场景
+     *************************************************/
+
+    if(cfg->scene == SCENE_POWER_OFF)
+    {
+
+        Device_Projector(false);
+
+
+        Device_AmpPower(false);
+
+
+        for(int i=0;i<8;i++)
+        {
+            Device_SetA(i+1,false);
+        }
+
+
+        for(int i=0;i<5;i++)
+        {
+            Device_SetB(i+1,false);
+        }
+
+
+        return;
+    }
+
+
+
+    /*************************************************
+     * 正常影音场景
+     *************************************************/
+
+
+    for(int i=0;i<8;i++)
+    {
+        Device_SetA(
+            i+1,
+            cfg->eastA[i]
+        );
+    }
+
+
+    for(int i=0;i<5;i++)
+    {
+        Device_SetB(
+            i+1,
+            cfg->eastB[i]
+        );
+    }
+
+
+
+    Device_AmpInput(
+        cfg->ampInput
+    );
+
+
+    Device_Projector(
+        cfg->useProjector
+    );
+
+
+
+
+
+
+
 
     /*************************************************
      * Eastcato A组
